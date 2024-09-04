@@ -4,5 +4,5 @@
 module.exports = app => {
   const { router, controller } = app;
   router.get('/', controller.home.index);
-  //注释
+  router.get('/user/:id', controller.home.user);
 };
