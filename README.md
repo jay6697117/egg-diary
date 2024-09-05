@@ -1,4 +1,4 @@
-# diary
+# egg-diary
 
 
 
