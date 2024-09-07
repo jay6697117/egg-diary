@@ -6,7 +6,11 @@ class HomeController extends Controller {
   // 首页
   async index() {
     const { ctx } = this;
-    ctx.body = `<h1>${JSON.stringify(ctx.query)}</h1>`;
+    // ctx.render 默认会去 view 文件夹寻找 index.html，这是 Egg 约定好的。
+    await ctx.render('index.html', {
+      title: '我是张金辉', // 将 title 传入 index.html
+    });
+    // ctx.body = `<h1>${JSON.stringify(ctx.query)}</h1>`;
   }
   // 获取用户信息
   async user() {
