@@ -8,7 +8,7 @@ class HomeController extends Controller {
     const { ctx } = this;
     // ctx.render 默认会去 view 文件夹寻找 index.html，这是 Egg 约定好的。
     await ctx.render('index.html', {
-      title: '我是张金辉', // 将 title 传入 index.html
+      title: '我是张金辉' // 将 title 传入 index.html
     });
     // ctx.body = `<h1>${JSON.stringify(ctx.query)}</h1>`;
   }
@@ -20,16 +20,6 @@ class HomeController extends Controller {
     <h3>${JSON.stringify(ctx.query)}</h3>
     </div>`;
   }
-
-  // 获取info信息
-  async info() {
-    const { ctx } = this;
-    console.log('ctx :>> ', ctx.service.home.info);
-    const result = await ctx.service.home.info();
-    ctx.body = result;
-  }
-
-
   // post 请求方法
   async add() {
     const { ctx } = this;
@@ -38,6 +28,34 @@ class HomeController extends Controller {
     ctx.body = {
       title
     };
+  }
+
+  // ------------------- 以下是新增的代码 -------------------
+  // 获取用户列表信息
+  async userList() {
+    const { ctx } = this;
+    console.log('ctx :>> ', ctx.service.home.userList);
+    const result = await ctx.service.home.userList();
+    ctx.body = result;
+  }
+
+  async addUser() {
+    const { ctx } = this;
+    const { name, age } = ctx.request.body;
+    try {
+      const result = await ctx.service.home.addUser({ name, age });
+      ctx.body = {
+        code: 200,
+        msg: '添加成功',
+        data: result
+      };
+    } catch (error) {
+      ctx.body = {
+        code: 500,
+        msg: '添加失败',
+        data: null
+      };
+    }
   }
 }
 
