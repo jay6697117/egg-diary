@@ -7,6 +7,7 @@ module.exports = app => {
   router.get('/', controller.home.index);
   router.get('/user/:id', controller.home.user);
   router.post('/add', controller.home.add);
-  router.get('/user_list', controller.home.userList);
-  router.post('/add_user', controller.home.addUser);
+  router.get('/user_list', controller.home.userList); // 查
+  router.post('/add_user', controller.home.addUser); // 增
+  router.post('/edit_user', controller.home.editUser); // 改
 };

@@ -28,6 +28,19 @@ class HomeService extends Service {
       return null;
     }
   }
+
+  async editUser(params) {
+    const { ctx, app } = this;
+    const { id, name, age } = params;
+    try {
+      const result = await app.mysql.update('user_list', { name, age }, { where: { id } });
+      console.log('result :>> ', result);
+      return { result };
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
 }
 
 module.exports = HomeService;
