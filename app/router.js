@@ -10,4 +10,5 @@ module.exports = app => {
   router.get('/user_list', controller.home.userList); // 查
   router.post('/add_user', controller.home.addUser); // 增
   router.post('/edit_user', controller.home.editUser); // 改
+  router.post('/delete_user', controller.home.deleteUser); // 改
 };

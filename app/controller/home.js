@@ -34,7 +34,6 @@ class HomeController extends Controller {
   // 获取用户列表信息
   async userList() {
     const { ctx } = this;
-    console.log('ctx :>> ', ctx.service.home.userList);
     const result = await ctx.service.home.userList();
     ctx.body = result;
   }
@@ -63,8 +62,8 @@ class HomeController extends Controller {
     const { ctx } = this;
     const { id, name, age } = ctx.request.body;
     try {
-      const { result } = await ctx.service.home.editUser(id, name, age);
-      console.log('result :>> ', result);
+      const { result } = await ctx.service.home.editUser({ id, name, age });
+      console.log('Controller result:>> ', result);
       ctx.body = {
         code: 200,
         msg: '修改成功',
@@ -74,6 +73,26 @@ class HomeController extends Controller {
       ctx.body = {
         code: 500,
         msg: '修改失败',
+        data: null
+      };
+    }
+  }
+
+  async deleteUser() {
+    const { ctx } = this;
+    const { id } = ctx.request.body;
+    try {
+      const { result } = await ctx.service.home.deleteUser({ id });
+      console.log('Controller deleteUser result:>> ', result);
+      ctx.body = {
+        code: 200,
+        msg: '删除成功',
+        data: result || null
+      };
+    } catch (error) {
+      ctx.body = {
+        code: 500,
+        msg: '删除失败',
         data: null
       };
     }

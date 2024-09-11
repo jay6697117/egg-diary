@@ -34,8 +34,21 @@ class HomeService extends Service {
     const { id, name, age } = params;
     try {
       const result = await app.mysql.update('user_list', { name, age }, { where: { id } });
-      console.log('result :>> ', result);
+      console.log('Service result:>> ', result);
       return { result };
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+
+  // 删除
+  async deleteUser({ id }) {
+    const { ctx, app } = this;
+    try {
+      const result = await app.mysql.delete('user_list', { id });
+      console.log('Service deleteUser result:>> ', result);
+      return result;
     } catch (error) {
       console.log(error);
       return null;
