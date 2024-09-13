@@ -45,13 +45,13 @@ class HomeController extends Controller {
       const result = await ctx.service.home.addUser({ name, age });
       ctx.body = {
         code: 200,
-        msg: '添加成功',
+        message: '添加成功',
         data: result
       };
     } catch (error) {
       ctx.body = {
         code: 500,
-        msg: '添加失败',
+        message: '添加失败',
         data: null
       };
     }
@@ -66,13 +66,13 @@ class HomeController extends Controller {
       console.log('Controller result:>> ', result);
       ctx.body = {
         code: 200,
-        msg: '修改成功',
+        message: '修改成功',
         data: result
       };
     } catch (error) {
       ctx.body = {
         code: 500,
-        msg: '修改失败',
+        message: '修改失败',
         data: null
       };
     }
@@ -86,13 +86,13 @@ class HomeController extends Controller {
       console.log('Controller deleteUser result:>> ', result);
       ctx.body = {
         code: 200,
-        msg: '删除成功',
+        message: '删除成功',
         data: result || null
       };
     } catch (error) {
       ctx.body = {
         code: 500,
-        msg: '删除失败',
+        message: '删除失败',
         data: null
       };
     }
