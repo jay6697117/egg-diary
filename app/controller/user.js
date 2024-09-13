@@ -38,8 +38,9 @@ class UserController extends Controller {
         avatar,
         signature
       });
+      console.log('register data:', data);
 
-      if (data) {
+      if (data && data.insertId) {
         ctx.body = {
           code: 200,
           message: 'register 注册成功',
