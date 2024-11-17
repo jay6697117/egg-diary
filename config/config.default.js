@@ -13,6 +13,11 @@ module.exports = appInfo => {
   // use for cookie sign key, should change to your own and keep security
   config.keys = appInfo.name + '_1725210229800_8380';
 
+  // 配置jwt
+  config.jwt = {
+    secret: 'egg-diary-jwt'
+  };
+
   // add your middleware config here
   config.middleware = [];
 

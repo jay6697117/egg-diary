@@ -2,6 +2,7 @@
 
 const { Controller } = require('egg');
 
+
 class HomeController extends Controller {
   // 首页
   async index() {
@@ -31,10 +32,17 @@ class HomeController extends Controller {
   }
 
   // ------------------- 以下是新增的代码 -------------------
-  // 获取用户列表信息
+  // 获取用户列表
   async userList() {
     const { ctx } = this;
     const result = await ctx.service.home.userList();
+    ctx.body = result;
+  }
+
+  // 获取用户集
+  async users() {
+    const { ctx } = this;
+    const result = await ctx.service.home.users();
     ctx.body = result;
   }
 
