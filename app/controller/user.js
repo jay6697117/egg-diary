@@ -1,44 +1,47 @@
 'use strict';
 
 const { Controller } = require('egg');
-const dayjs = require('dayjs'); // 引入方式 1
+const dayjs = require('dayjs');
 
-// 默认头像，放在 user.js 的最外，部避免重复声明。
 const defaultAvatar = 'http://s.yezgea02.com/1615973940679/WeChat77d6d2ac093e247c361f0b8a7aeb6c2a.png';
-const defaultSignature = `我是签名-${Date.now()}`; // 使用模板字符串替代字符串拼接
+const defaultSignature = `我是签名-${Date.now()}`;
 const defaultCtimeFn = timestamp => {
   return dayjs(timestamp).format('YYYY-MM-DD HH:mm:ss');
 };
+
 class UserController extends Controller {
-  // 注册接口
+  // 统一错误响应方法
+  errorResponse(message, code = 500) {
+    this.ctx.body = {
+      code,
+      message,
+      data: null
+    };
+  }
+
+  // 统一成功响应方法
+  successResponse(data, message = '操作成功') {
+    this.ctx.body = {
+      code: 200,
+      message,
+      data
+    };
+  }
+
   async register() {
     const { ctx } = this;
     try {
       const { username, password, ctime, avatar, signature } = ctx.request.body;
-      // 验证数据库内是否已经有该账户名
-      const userInfo = await ctx.service.user.getUserByName(username); // 获取用户信息
-      console.log('register userInfo :>> ', userInfo);
 
       if (!username || !password) {
-        ctx.body = {
-          code: 500,
-          message: 'register 账号密码不能为空',
-          data: null
-        };
-        return;
-      }
-      // 判断是否已经存在
-      if (userInfo?.id) {
-        ctx.body = {
-          code: 500,
-          message: 'register 账户名已被注册，请重新输入',
-          data: null
-        };
-        return;
+        return this.errorResponse('账号密码不能为空');
       }
 
-      // 调用 service 方法，将数据存入数据库。
-      // username和password ctime,avatar和signature是选填项
+      const userInfo = await ctx.service.user.getUserByName(username);
+      if (userInfo?.id) {
+        return this.errorResponse('账户名已被注册，请重新输入');
+      }
+
       const result = await ctx.service.user.registerUser({
         username,
         password,
@@ -46,107 +49,73 @@ class UserController extends Controller {
         avatar: avatar || defaultAvatar,
         signature: signature || defaultSignature
       });
-      console.log('register result:', result);
 
       if (result && result.insertId) {
-        ctx.body = {
-          code: 200,
-          message: 'register 注册成功',
-          data: {
-            id: result.insertId,
-            username,
-            password,
-            ctime: defaultCtimeFn(ctime),
-            avatar: avatar || defaultAvatar,
-            signature: signature || defaultSignature
-          }
-        };
-      } else {
-        ctx.body = {
-          code: 500,
-          message: 'register 注册失败-1',
-          data: null
-        };
+        return this.successResponse({
+          id: result.insertId,
+          username,
+          password,
+          ctime: defaultCtimeFn(ctime),
+          avatar: avatar || defaultAvatar,
+          signature: signature || defaultSignature
+        }, '注册成功');
       }
+      return this.errorResponse('注册失败，请稍后重试');
     } catch (error) {
-      ctx.body = {
-        code: 500,
-        message: 'register 注册失败-2',
-        data: null
-      };
+      console.error('注册失败:', error);
+      return this.errorResponse('注册失败，服务器异常');
     }
   }
 
-  // 登录接口
   async login() {
-    console.log('login run');
-    // app 为全局属性，相当于所有的插件方法都植入到了 app 对象。
     const { app, ctx } = this;
-    // 获取请求体
-    const { username, password } = ctx.request.body;
-    // 根据用户名，在数据库查找相对应的id操作
-    const userInfo = await ctx.service.user.getUserByName(username);
-    console.log('userInfo login:', userInfo);
-    // 没找到说明没有该用户
-    if (!userInfo?.id) {
-      ctx.body = {
-        code: 500,
-        msg: '账号不存在',
-        data: null
-      };
-      return;
-    }
-    // 找到用户，并且判断输入密码与数据库中用户密码。
-    if (userInfo && password !== userInfo.password) {
-      ctx.body = {
-        code: 500,
-        msg: '账号密码错误',
-        data: null
-      };
-      return;
-    }
+    try {
+      const { username, password } = ctx.request.body;
 
-    // 生成 token
-    // app.jwt.sign 方法接受两个参数，第一个为对象，对象内是需要加密的内容；第二个是加密字符串，上文已经提到过。
-    const token = app.jwt.sign(
-      {
-        id: userInfo.id,
-        username: userInfo.username,
-        exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // token 有效期为 24 小时
-        // exp: Math.floor(Date.now() / 1000) + 20 // token 有效期为 20秒
-      },
-      app.config.jwt.secret
-    );
-
-    console.log('token :>> ', token);
-    await ctx.service.user.updateUserToken(userInfo.id, token);
-    ctx.body = {
-      code: 200,
-      message: '登录成功',
-      data: {
-        token
+      if (!username || !password) {
+        return this.errorResponse('账号密码不能为空');
       }
-    };
+
+      const userInfo = await ctx.service.user.getUserByName(username);
+      if (!userInfo?.id) {
+        return this.errorResponse('账号不存在');
+      }
+
+      if (password !== userInfo.password) {
+        return this.errorResponse('账号密码错误');
+      }
+
+      const token = app.jwt.sign(
+        {
+          id: userInfo.id,
+          username: userInfo.username,
+          exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60)
+        },
+        app.config.jwt.secret
+      );
+
+      await ctx.service.user.updateUserToken(userInfo.id, token);
+      return this.successResponse({ token }, '登录成功');
+    } catch (error) {
+      console.error('登录失败:', error);
+      return this.errorResponse('登录失败，服务器异常');
+    }
   }
 
-  // 验证方法
   async test() {
-    console.log('test run');
     const { ctx, app } = this;
-    // 通过 token 解析，拿到 user_id
-    const { authorization: token } = ctx.request.header; // 请求头获取 authorization 属性，值为 token
-    console.log('token :>> ', token);
-    // 通过 app.jwt.verify + 加密字符串 解析出 token 的值
-    const decode = await app.jwt.verify(token, app.config.jwt.secret);
-    console.log('decode :>> ', decode);
-    // 响应接口
-    ctx.body = {
-      code: 200,
-      message: '获取成功',
-      data: {
-        ...decode
+    try {
+      const { authorization: token } = ctx.request.header;
+      if (!token) {
+        return this.errorResponse('未提供认证令牌', 401);
       }
-    };
+
+      const decode = await app.jwt.verify(token, app.config.jwt.secret);
+      return this.successResponse({ ...decode }, '获取成功');
+    } catch (error) {
+      console.error('Token验证失败:', error);
+      return this.errorResponse('认证失败，请重新登录', 401);
+    }
   }
 }
 
