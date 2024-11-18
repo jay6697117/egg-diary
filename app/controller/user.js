@@ -4,7 +4,7 @@ const { Controller } = require('egg');
 const dayjs = require('dayjs');
 
 const defaultAvatar = 'http://s.yezgea02.com/1615973940679/WeChat77d6d2ac093e247c361f0b8a7aeb6c2a.png';
-const defaultSignature = `我是签名-${Date.now()}`;
+const defaultSignature = '我是egg-diary项目签名';
 const defaultCtimeFn = timestamp => {
   return dayjs(timestamp).format('YYYY-MM-DD HH:mm:ss');
 };
