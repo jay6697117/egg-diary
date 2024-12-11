@@ -5,10 +5,11 @@ module.exports = secret => {
     const token = ctx.request.header.authorization;
 
     if (!token || token === 'null') {
-      return ctx.body = {
+      ctx.body = {
         code: 401,
         msg: '未提供访问令牌'
       };
+      return;
     }
 
     try {
@@ -16,19 +17,21 @@ module.exports = secret => {
       const userInfo = await ctx.service.user.getUserById(decode.id);
 
       if (!userInfo || userInfo.current_token !== token) {
-        return ctx.body = {
+        ctx.body = {
           code: 401,
           msg: '登录令牌已失效，请重新登录'
         };
+        return;
       }
 
       await next();
     } catch (error) {
       console.log('JWT验证错误:', error);
-      return ctx.body = {
+      ctx.body = {
         code: 401,
         msg: '令牌已过期或无效，请重新登录'
       };
+      return;
     }
   };
 };
