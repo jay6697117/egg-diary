@@ -7,7 +7,7 @@ module.exports = secret => {
     if (!token || token === 'null') {
       ctx.body = {
         code: 401,
-        msg: '未提供访问令牌'
+        msg: '未提供访问令牌1111'
       };
       return;
     }
