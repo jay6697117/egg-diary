@@ -7,7 +7,7 @@
     <title>图片上传</title>
   </head>
   <body>
-    <input type="file" id="upload" />
+    <input type="file" id="upload" accept="*" />
     <script>
       // 获取 input 标签的 dom
       let input = document.getElementById('upload');
@@ -20,9 +20,14 @@
         // 添加实例属性 file
         formData.append('file', file);
         console.log('formData', formData);
+
         // 调用服务端上传接口。
         fetch('http://localhost:7001/api/upload_file', {
           method: 'POST',
+          headers: {
+            Authorization:
+              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiIwMDEiLCJleHAiOjE3MzQzNjI0NTEsImlhdCI6MTczNDI3NjA1MX0.ikJYAyabMF8z5ZxU3MshLq72HT1LSAmgkCq1OPvBxPY' // 添加token到header中
+          },
           body: formData
         })
           .then(res => {
@@ -35,6 +40,28 @@
           })
           .then(res => {
             console.log('res is', res);
+            fetch('http://localhost:7001/api/user/edit_user_info', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization:
+                  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiIwMDEiLCJleHAiOjE3MzQzNjI0NTEsImlhdCI6MTczNDI3NjA1MX0.ikJYAyabMF8z5ZxU3MshLq72HT1LSAmgkCq1OPvBxPY' // 添加token到header中
+              },
+              body: JSON.stringify({
+                avatar: 'http://localhost:7001' + res.data
+              })
+            })
+              .then(res => {
+                if (res.ok) {
+                  console.log('success1');
+                  return res.json();
+                } else {
+                  console.log('error');
+                }
+              })
+              .then(res => {
+                console.log('res is 1:', res);
+              });
           });
       });
     </script>

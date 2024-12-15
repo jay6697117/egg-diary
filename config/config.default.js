@@ -43,7 +43,23 @@ module.exports = appInfo => {
   };
 
   config.multipart = {
-    mode: 'file'
+    mode: 'file',
+    fileSize: '100mb', // 设置上传文件大小限制
+    fileExtensions: [ '*' ],
+    whitelist: () => true, // 允许所有文件类型
+    // 设置上传文件的数量限制
+    files: 10,
+    // 设置非文件字段的大小限制
+    fields: 10,
+    // 设置请求体的大小限制
+    maxFields: 1000,
+    // 设置临时文件目录
+    tmpdir: path.join(appInfo.baseDir, 'app/public/temp'),
+    // 清除临时文件的时机
+    cleanSchedule: {
+      // 间隔时间，单位为 ms
+      interval: '3600s'
+    }
   };
 
   config.cors = {
