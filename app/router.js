@@ -7,13 +7,16 @@ module.exports = app => {
   const _jwt = middleware.jwtErr(app.config.jwt.secret); // 传入加密字符串
 
   const prefix = '/api';
-  router.get('/', controller.home.index); // 登录首页
+  router.get('/', controller.home.index); // 登录首页: 无jwt
   router.get(`${prefix}/user_list`, _jwt, controller.home.userList); // 查user_list
   router.get(`${prefix}/users`, _jwt, controller.home.users); // 查users
   router.post(`${prefix}/add_user`, _jwt, controller.home.addUser); // 增
   router.post(`${prefix}/delete_user`, _jwt, controller.home.deleteUser); // 删
   router.post(`${prefix}/edit_user`, _jwt, controller.home.editUser); // 改
-  router.post(`${prefix}/user/register`, controller.user.register); // 注册
-  router.post(`${prefix}/user/login`, controller.user.login); // 登录
-  router.get(`${prefix}/user/test`, _jwt, controller.user.test); // 验证
+  router.post(`${prefix}/user/register`, controller.user.register); // 注册: 无jwt
+  router.post(`${prefix}/user/login`, controller.user.login); // 登录: 无jwt
+  router.get(`${prefix}/user/test`, _jwt, controller.user.test); // 验证jwt
+  router.get(`${prefix}/user/get_user_info`, _jwt, controller.user.getUserInfo); // 获取用户信息
+  router.post(`${prefix}/user/edit_user_info`, _jwt, controller.user.editUserInfo); // 修改用户信息
+  router.post(`${prefix}/upload_file`, controller.upload.uploadFile); // 上传
 };

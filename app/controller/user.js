@@ -51,14 +51,17 @@ class UserController extends Controller {
       });
 
       if (result && result.insertId) {
-        return this.successResponse({
-          id: result.insertId,
-          username,
-          password,
-          ctime: defaultCtimeFn(ctime),
-          avatar: avatar || defaultAvatar,
-          signature: signature || defaultSignature
-        }, '注册成功');
+        return this.successResponse(
+          {
+            id: result.insertId,
+            username,
+            password,
+            ctime: defaultCtimeFn(ctime),
+            avatar: avatar || defaultAvatar,
+            signature: signature || defaultSignature
+          },
+          '注册成功'
+        );
       }
       return this.errorResponse('注册失败，请稍后重试');
     } catch (error) {
@@ -89,8 +92,8 @@ class UserController extends Controller {
         {
           id: userInfo.id,
           username: userInfo.username,
-          // exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60)
-          exp: Math.floor(Date.now() / 1000) + (20) // 测试用 20秒有效期
+          exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24小时有效期
+          // exp: Math.floor(Date.now() / 1000) + 20 // 测试用 20秒有效期
         },
         app.config.jwt.secret
       );
@@ -103,6 +106,7 @@ class UserController extends Controller {
     }
   }
 
+  // 验证jwt接口
   async test() {
     const { ctx, app } = this;
     try {
@@ -116,6 +120,72 @@ class UserController extends Controller {
     } catch (error) {
       console.error('Token验证失败:', error);
       return this.errorResponse('认证失败，请重新登录', 401);
+    }
+  }
+
+  // 获取用户信息
+  async getUserInfo() {
+    const { ctx, app } = this;
+    const { authorization: token } = ctx.request.header;
+    // 通过 app.jwt.verify 方法，解析出 token 内的用户信息
+    const decode = await app.jwt.verify(token, app.config.jwt.secret);
+    // 通过 getUserByName 方法，以用户名 decode.username 为参数，从数据库获取到该用户名下的相关信息
+    // const userInfo = await ctx.service.user.getUserByName(decode.username);
+    const userInfo = await ctx.service.user.getUserById(decode.id);
+    // userInfo 中应该有密码信息，所以我们指定下面四项返回给客户端
+
+    console.log('getUserInfo userInfo:', userInfo);
+    ctx.body = {
+      code: 200,
+      msg: '请求成功',
+      data: {
+        id: userInfo.id,
+        username: userInfo.username,
+        avatar: userInfo.avatar || defaultAvatar,
+        signature: userInfo.signature || '',
+
+      }
+    };
+  }
+
+  // 修改用户信息
+  async editUserInfo() {
+    const { ctx, app } = this;
+    // 通过 post 请求，在请求体中获取签名字段 signature
+    const { signature = '' } = ctx.request.body;
+
+    try {
+      // let user_id;
+      const { authorization: token } = ctx.request.header;
+      // 解密 token 中的用户名称
+      const decode = await app.jwt.verify(token, app.config.jwt.secret);
+      if (!decode) return;
+
+      const user_id = decode.id;
+      // 通过 username 查找 userInfo 完整信息
+      // const userInfo = await ctx.service.user.getUserByName(decode.username);
+      const userInfo = await ctx.service.user.getUserById(decode.id);
+      // 通过 service 方法 editUserInfo 修改 signature 信息。
+      const result = await ctx.service.user.editUserInfo({
+        ...userInfo,
+        signature
+      });
+
+      console.log('editUserInfo result:', result);
+      console.log('editUserInfo result:', signature);
+
+      ctx.body = {
+        code: 200,
+        msg: '请求成功',
+        data: {
+          id: user_id,
+          signature,
+          username: userInfo.username
+        }
+      };
+    } catch (error) {
+      console.error('修改用户信息失败:', error);
+      return this.errorResponse('修改用户信息失败，服务器异常');
     }
   }
 }
