@@ -7,7 +7,7 @@ module.exports = app => {
   const _jwt = middleware.jwtErr(app.config.jwt.secret); // 传入加密字符串
 
   const prefix = '/api';
-  router.get('/', controller.home.index); // 登录首页: 无jwt
+  router.get('/', controller.home.index); // 首页: 无jwt
   router.get(`${prefix}/user_list`, _jwt, controller.home.userList); // 查user_list
   router.get(`${prefix}/users`, _jwt, controller.home.users); // 查users
   router.post(`${prefix}/add_user`, _jwt, controller.home.addUser); // 增
