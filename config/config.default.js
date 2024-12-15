@@ -42,8 +42,6 @@ module.exports = appInfo => {
     mapping: { '.html': 'ejs' } // 左边写成.html后缀，会自动渲染.html文件
   };
 
-  // config.uploadDir = path.join(__dirname, '../app/public/upload');
-
   config.multipart = {
     mode: 'file'
   };
