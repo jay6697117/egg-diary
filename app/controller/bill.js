@@ -11,7 +11,7 @@ class BillController extends Controller {
   async add() {
     const { ctx, app } = this;
     // 获取请求中携带的参数
-    const { amount, type_id, type_name, pay_type, remark = '' } = ctx.request.body;
+    const { amount, pay_type, type_id, type_name, remark = '' } = ctx.request.body;
 
     // 判空处理，确保必要参数都已提供
     if (!amount || !type_id || !type_name || !pay_type) {
@@ -36,17 +36,18 @@ class BillController extends Controller {
         };
         return;
       }
-      const user_id = decode.id;
+      const { id: user_id, username: user_name } = decode;
 
       // 调用service层方法添加账单
       const result = await ctx.service.bill.add({
+        user_id,
+        user_name,
         amount,
+        pay_type,
         type_id,
         type_name,
         date: Date.now() + '',
-        pay_type,
-        remark,
-        user_id
+        remark
       });
 
       console.log('add controller result :>> ', result);
