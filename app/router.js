@@ -20,4 +20,5 @@ module.exports = app => {
   router.post(`${prefix}/user/edit_user_info`, _jwt, controller.user.editUserInfo); // 修改用户信息
   router.post(`${prefix}/upload_file`, _jwt, controller.upload.uploadFile); // 上传文件
   router.post(`${prefix}/bill/add`, _jwt, controller.bill.add); // 新增账单
+  router.get(`${prefix}/bill/list`, _jwt, controller.bill.list); // 获取账单列表
 };

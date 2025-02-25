@@ -26,6 +26,20 @@ class BillService extends Service {
       return null;
     }
   }
+
+  // 获取账单列表
+  async list(id) {
+    const { ctx, app } = this;
+    const QUERY_STR = 'id, amount, pay_type, type_id, type_name, date, remark';
+    const sql = `select ${QUERY_STR} from bill where user_id = ${id}`;
+    try {
+      const result = await app.mysql.query(sql);
+      return result;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
 }
 
 module.exports = BillService;
