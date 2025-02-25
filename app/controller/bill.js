@@ -74,7 +74,7 @@ class BillController extends Controller {
   async list() {
     const { ctx, app } = this;
     // 获取，日期 date，分页数据，类型 type_id，这些都是我们在前端传给后端的数据
-    const { date, page = 1, page_size = 1, type_id = 'all' } = ctx.query;
+    const { date, page = 1, page_size = 5, type_id = 'all' } = ctx.query;
 
     try {
       // 通过 token 解析，拿到 user_id
@@ -123,13 +123,15 @@ class BillController extends Controller {
           return curr;
         }, [])
         .sort((a, b) => moment(b.date) - moment(a.date)); // 时间顺序为倒叙，时间约新的，在越上面
-
+      console.log('_list :>> ', _list);
+      console.log('listMap :>> ', listMap);
       // 分页处理，listMap 为我们格式化后的全部数据，还未分页。
       const filterListMap = listMap.slice((page - 1) * page_size, page * page_size);
 
       // 计算当月总收入和支出
       // 首先获取当月所有账单列表
       const __list = list.filter(item => moment(Number(item.date)).format('YYYY-MM') === date);
+      console.log('__list :>> ', __list);
       // 累加计算支出
       const totalExpense = __list.reduce((curr, item) => {
         if (item.pay_type === 1) {
