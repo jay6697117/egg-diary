@@ -40,6 +40,23 @@ class BillService extends Service {
       return null;
     }
   }
+
+  // 获取账单详情
+  async detail({ id, user_id }) {
+    const { ctx, app } = this;
+    try {
+      // 安全做法：同时验证记录ID和所属用户（推荐）
+      // 推荐保留 user_id 的原因：
+      // 权限验证：防止用户通过猜测 bill_id 访问他人账单（纵深防御）
+      // 数据隔离：确保查询结果严格属于当前用户（user_id 来自 JWT token）
+      // 索引优化：如果表中存在 (id, user_id) 的复合索引，查询效率更高
+      const result = await app.mysql.get('bill', { id, user_id });
+      return result;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
 }
 
 module.exports = BillService;
