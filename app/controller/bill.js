@@ -132,7 +132,7 @@ class BillController extends Controller {
       // 首先获取当月所有账单列表
       const __list = list.filter(item => moment(Number(item.date)).format('YYYY-MM') === date);
       console.log('__list :>> ', __list);
-      // 累加计算支出
+      // 累加计算支出:1 支出 || 2收入
       const totalExpense = __list.reduce((curr, item) => {
         if (item.pay_type === 1) {
           curr += Number(item.amount);
@@ -140,7 +140,7 @@ class BillController extends Controller {
         }
         return curr;
       }, 0);
-      // 累加计算收入
+      // 累加计算收入:1 支出 || 2收入
       const totalIncome = __list.reduce((curr, item) => {
         if (item.pay_type === 2) {
           curr += Number(item.amount);
@@ -169,7 +169,6 @@ class BillController extends Controller {
     }
   }
 
-
   // 获取账单详情
   async detail() {
     const { ctx, app } = this;
@@ -193,7 +192,7 @@ class BillController extends Controller {
     }
 
     try {
-    // 从数据库获取账单详情
+      // 从数据库获取账单详情
       const detail = await ctx.service.bill.detail({ id, user_id });
       console.log('detail :>> ', detail);
       ctx.body = {
@@ -248,6 +247,52 @@ class BillController extends Controller {
         msg: '请求成功',
         data: result
       };
+    } catch (error) {
+      ctx.body = {
+        code: 500,
+        msg: '系统错误',
+        data: null
+      };
+    }
+  }
+
+  // 删除账单
+  async delete() {
+    const { ctx, app } = this;
+    const { id } = ctx.request.body;
+
+    if (!id) {
+      ctx.body = {
+        code: 400,
+        msg: '参数错误',
+        data: null
+      };
+    }
+
+    try {
+      const token = ctx.request.header.authorization;
+      const decode = await app.jwt.verify(token, app.config.jwt.secret);
+      if (!decode) return;
+      const user_id = decode.id;
+      const result = await ctx.service.bill.delete({ id, user_id });
+      console.log('delete controller id :>> ', id);
+      console.log('delete controller user_id :>> ', user_id);
+      console.log('delete controller result :>> ', result);
+      if (!result?.affectedRows) {
+        ctx.body = {
+          code: 500,
+          msg: '删除数据不存在',
+          data: null
+        };
+        return;
+      }
+
+      ctx.body = {
+        code: 200,
+        msg: '请求成功',
+        data: result
+      };
+
     } catch (error) {
       ctx.body = {
         code: 500,

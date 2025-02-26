@@ -30,7 +30,7 @@ class BillService extends Service {
   // 获取账单列表
   async list(id) {
     const { ctx, app } = this;
-    const QUERY_STR = 'id, amount, pay_type, type_id, type_name, date, remark';
+    const QUERY_STR = 'id, user_id, user_name, amount, pay_type, type_id, type_name, date, remark';
     const sql = `select ${QUERY_STR} from bill where user_id = ${id}`;
     try {
       const result = await app.mysql.query(sql);
@@ -62,13 +62,32 @@ class BillService extends Service {
   async update(params) {
     const { ctx, app } = this;
     try {
-      const result = await app.mysql.update('bill', {
-        ...params
-      }, {
-        where: {
-          id: params.id, // 账单id
-          user_id: params.user_id // 用户id
+      const result = await app.mysql.update(
+        'bill',
+        {
+          ...params
+        },
+        {
+          where: {
+            id: params.id, // 账单id
+            user_id: params.user_id // 用户id
+          }
         }
+      );
+      return result;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+
+  // 删除账单
+  async delete({ id, user_id }) {
+    const { ctx, app } = this;
+    try {
+      const result = await app.mysql.delete('bill', {
+        id, // 账单id
+        user_id // 用户id
       });
       return result;
     } catch (error) {
