@@ -1,6 +1,7 @@
 'use strict';
 
 const moment = require('moment');
+// const _ = require('lodash');
 const Controller = require('egg').Controller;
 
 class BillController extends Controller {
@@ -349,19 +350,28 @@ class BillController extends Controller {
       let total_data = _data.reduce((arr, cur) => {
         const index = arr.findIndex(item => item.type_id === cur.type_id);
         if (index === -1) {
+          // const tempObj = _.cloneDeep(cur);
+          // delete tempObj.remark;
+          // delete tempObj.date;
+          // delete tempObj.id;
+
           arr.push({
-            ...cur,
-            amount: Number(cur.amount)
+            user_id: cur.user_id, // 用户 id
+            user_name: cur.user_name, // 用户 id
+            number: Number(cur.amount), // 金额
+            pay_type: cur.pay_type, // 消费类型
+            type_id: cur.type_id, // 消费类型 id
+            type_name: cur.type_name // 消费类型名称
           });
         }
         if (index > -1) {
-          arr[index].amount += Number(cur.amount);
+          arr[index].number += Number(cur.amount);
         }
         return arr;
       }, []);
 
       total_data = total_data.map(item => {
-        item.amount = Number(Number(item.amount).toFixed(2));
+        item.number = Number(item.number).toFixed(2);
         return item;
       });
 
