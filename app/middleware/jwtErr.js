@@ -2,6 +2,7 @@
 
 module.exports = secret => {
   return async function jwtErr(ctx, next) {
+    console.log('jwtErr middleware called');
     const token = ctx.request.header.authorization;
 
     if (!token || token === 'null') {

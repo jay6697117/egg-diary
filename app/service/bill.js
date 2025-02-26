@@ -65,8 +65,10 @@ class BillService extends Service {
       const result = await app.mysql.update('bill', {
         ...params
       }, {
-        id: params.id,
-        user_id: params.user_id
+        where: {
+          id: params.id, // 账单id
+          user_id: params.user_id // 用户id
+        }
       });
       return result;
     } catch (error) {

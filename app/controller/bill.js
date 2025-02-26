@@ -214,10 +214,10 @@ class BillController extends Controller {
   async update() {
     const { ctx, app } = this;
     // 账单的相关参数，这里注意要把账单的 id 也传进来
-    const { id, amount, pay_type, type_id, type_name, date, remark = '' } = ctx.request.body;
+    const { id, amount, pay_type, type_id, type_name, remark = '' } = ctx.request.body;
 
     // 判空校验
-    if (!id || !amount || !type_id || !type_name || !date || !pay_type) {
+    if (!id || !amount || !type_id || !type_name || !pay_type) {
       ctx.body = {
         code: 400,
         msg: '参数错误',
@@ -238,10 +238,11 @@ class BillController extends Controller {
         amount, // 金额
         type_id, // 消费类型 id
         type_name, // 消费类型名称
-        date, // 日期
+        date: Date.now() + '', // 日期
         pay_type, // 消费类型
         remark // 备注
       });
+      console.log('update controller result :>> ', result);
       ctx.body = {
         code: 200,
         msg: '请求成功',

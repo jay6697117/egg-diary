@@ -22,4 +22,5 @@ module.exports = app => {
   router.post(`${prefix}/bill/add`, _jwt, controller.bill.add); // 新增账单
   router.get(`${prefix}/bill/list`, _jwt, controller.bill.list); // 获取账单列表
   router.get(`${prefix}/bill/detail`, _jwt, controller.bill.detail); // 获取账单详情
+  router.post(`${prefix}/bill/update`, _jwt, controller.bill.update); // 修改账单
 };
